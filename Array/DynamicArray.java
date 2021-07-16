@@ -2,6 +2,7 @@
 package Array;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 @SuppressWarnings("unchecked")
 
@@ -73,13 +74,18 @@ public class DynamicArray<T> implements Iterable<T> {
         if (rmIndex >= len || rmIndex < 0)
             throw new IndexOutOfBoundsException();
         T data = arr[rmIndex];
-        T[] newArr = (T[]) new Object[len - 1];
-        for (int i = 0, j = 0; i < len; i++, j++) {
-            if (i == rmIndex)
-                j--; // Skip over rmIndex by fixing j temporarily
-            else
-                newArr[j] = arr[i];
+        // T[] newArr = (T[]) new Object[len - 1];
+        // for (int i = 0, j = 0; i < len; i++, j++) {
+        // if (i == rmIndex)
+        // j--; // Skip over rmIndex by fixing j temporarily
+        // else
+        // newArr[j] = arr[i];
+        // }
+        // arr = newArr;
+        for (int i = rmIndex; i < len - 1; i++) {
+            arr[i] = arr[i + 1];
         }
+        T[] newArr = Arrays.copyOf(arr, len - 1);
         arr = newArr;
         capacity = --len;
         return data;
@@ -123,6 +129,8 @@ public class DynamicArray<T> implements Iterable<T> {
 
             @Override
             public T next() {
+                if (index >= len)
+                    throw new NoSuchElementException();
                 return arr[index++];
             }
 
