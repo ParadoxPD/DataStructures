@@ -38,4 +38,4 @@ Programs implementing Data Structures and algorithms
 
 ## References :
 -  [Data Structures Easy to Advanced Course - Full Tutorial from a Google Engineer](https://www.youtube.com/watch?v=RBSGKlAvoiM)
--  [Github Src](https://github.com/williamfiset/Algorithms/tree/master/src/main/java/com/williamfiset/algorithms/datastructures)
+-  [Github - Williamfiset](https://github.com/williamfiset/Algorithms/tree/master/src/main/java/com/williamfiset/algorithms/datastructures)
