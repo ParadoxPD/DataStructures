@@ -25,14 +25,14 @@ public class SinglyLinkedList<T> implements Iterable<T> {
 
     // Empty this linked list, O(n)
     public void clear() {
-        Node<T> trav = head;
-        while (trav != null) {
-            Node<T> next = trav.next;
-            trav.next = null;
-            trav.data = null;
-            trav = next;
+        Node<T> ptr = head;
+        while (ptr != null) {
+            Node<T> next = ptr.next;
+            ptr.next = null;
+            ptr.data = null;
+            ptr = next;
         }
-        head = tail = trav = null;
+        head = tail = ptr = null;
         size = 0;
     }
 
@@ -64,13 +64,14 @@ public class SinglyLinkedList<T> implements Iterable<T> {
 
     // Add an element to the beginning of this linked list, O(1)
     public void addFirst(T elem) {
-        // if (isEmpty()) {
-        // head = tail = new Node<T>(elem, null);
-        // } else {
-        // head.prev = new Node<T>(elem, null, head);
-        // head = head.prev;
-        // }
-        // size++;
+        if (isEmpty()) {
+            head = tail = new Node<T>(elem, null);
+        } else {
+
+            Node<T> temp = new Node<T>(elem, head);
+            head = temp;
+        }
+        size++;
     }
 
     // Add an element at a specified index
@@ -92,9 +93,8 @@ public class SinglyLinkedList<T> implements Iterable<T> {
         for (int i = 0; i < index - 1; i++) {
             temp = temp.next;
         }
-        // Node<T> newNode = new Node<>(data, temp, temp.next);
-        // temp.next.prev = newNode;
-        // temp.next = newNode;
+        Node<T> newNode = new Node<>(data, temp.next);
+        temp.next = newNode;
 
         size++;
     }
@@ -129,10 +129,6 @@ public class SinglyLinkedList<T> implements Iterable<T> {
         if (isEmpty())
             tail = null;
 
-        // Do a memory cleanup of the previous node
-        // else
-        // head.prev = null;
-
         // Return the data that was at the first node we just removed
         return data;
     }
@@ -146,7 +142,13 @@ public class SinglyLinkedList<T> implements Iterable<T> {
         // Extract the data at the tail and move
         // the tail pointer backwards one node
         T data = tail.data;
-        // tail = tail.prev;
+        Node<T> ptr = head;
+        Node<T> prev = head;
+        while (ptr.next != null) {
+            prev = ptr;
+            ptr = ptr.next;
+        }
+        tail = prev;
         --size;
 
         // If the list is now empty set the head to null
@@ -165,14 +167,22 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     private T remove(Node<T> node) {
         // If the node to remove is somewhere either at the
         // head or the tail handle those independently
-        // if (node.prev == null)
-        // return removeFirst();
+        if (node == head)
+            return removeFirst();
         if (node.next == null)
             return removeLast();
 
         // Make the pointers of adjacent nodes skip over 'node'
         // node.next.prev = node.prev;
         // node.prev.next = node.next;
+        Node<T> ptr = head;
+        Node<T> prev = head;
+        while (ptr.next != null || ptr != node) {
+            prev = ptr;
+            ptr = ptr.next;
+        }
+
+        prev.next = node.next;
 
         // Temporarily store the data we want to return
         T data = node.data;
@@ -195,39 +205,39 @@ public class SinglyLinkedList<T> implements Iterable<T> {
         }
 
         int i;
-        Node<T> trav;
+        Node<T> ptr;
 
         // Search from the front of the list
         if (index < size / 2) {
-            for (i = 0, trav = head; i != index; i++) {
-                trav = trav.next;
+            for (i = 0, ptr = head; i != index; i++) {
+                ptr = ptr.next;
             }
             // Search from the back of the list
         } else
-            for (i = size - 1, trav = tail; i != index; i--) {
-                // trav = trav.prev;
+            for (i = size - 1, ptr = tail; i != index; i--) {
+                // ptr = ptr.prev;
             }
 
-        return remove(trav);
+        return remove(ptr);
     }
 
     // Remove a particular value in the linked list, O(n)
     public boolean remove(Object obj) {
-        Node<T> trav;
+        Node<T> ptr;
 
         // Support searching for null
         if (obj == null) {
-            for (trav = head; trav != null; trav = trav.next) {
-                if (trav.data == null) {
-                    remove(trav);
+            for (ptr = head; ptr != null; ptr = ptr.next) {
+                if (ptr.data == null) {
+                    remove(ptr);
                     return true;
                 }
             }
             // Search for non null object
         } else {
-            for (trav = head; trav != null; trav = trav.next) {
-                if (obj.equals(trav.data)) {
-                    remove(trav);
+            for (ptr = head; ptr != null; ptr = ptr.next) {
+                if (obj.equals(ptr.data)) {
+                    remove(ptr);
                     return true;
                 }
             }
@@ -238,19 +248,19 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     // Find the index of a particular value in the linked list, O(n)
     public int indexOf(Object obj) {
         int index = 0;
-        Node<T> trav = head;
+        Node<T> ptr = head;
 
         // Support searching for null
         if (obj == null) {
-            for (; trav != null; trav = trav.next, index++) {
-                if (trav.data == null) {
+            for (; ptr != null; ptr = ptr.next, index++) {
+                if (ptr.data == null) {
                     return index;
                 }
             }
             // Search for non null object
         } else
-            for (; trav != null; trav = trav.next, index++) {
-                if (obj.equals(trav.data)) {
+            for (; ptr != null; ptr = ptr.next, index++) {
+                if (obj.equals(ptr.data)) {
                     return index;
                 }
             }
@@ -266,11 +276,11 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     @Override
     public java.util.Iterator<T> iterator() {
         return new java.util.Iterator<T>() {
-            private Node<T> trav = head;
+            private Node<T> ptr = head;
 
             @Override
             public boolean hasNext() {
-                return trav != null;
+                return ptr != null;
             }
 
             @Override
@@ -278,8 +288,8 @@ public class SinglyLinkedList<T> implements Iterable<T> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                T data = trav.data;
-                trav = trav.next;
+                T data = ptr.data;
+                ptr = ptr.next;
                 return data;
             }
 
@@ -294,13 +304,13 @@ public class SinglyLinkedList<T> implements Iterable<T> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[ ");
-        Node<T> trav = head;
-        while (trav != null) {
-            sb.append(trav.data);
-            if (trav.next != null) {
+        Node<T> ptr = head;
+        while (ptr != null) {
+            sb.append(ptr.data);
+            if (ptr.next != null) {
                 sb.append(", ");
             }
-            trav = trav.next;
+            ptr = ptr.next;
         }
         sb.append(" ]");
         return sb.toString();
